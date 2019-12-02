@@ -37,52 +37,73 @@ import doctest
 class IntcodeComputer:
 
   def __init__(self):
-    self.pc = 0
+    self.ip = 0
     self.halt = False
     self.mem = []
-    self.op_impl = {}
-    self.op_impl[1] = self.exec_op01
-    self.op_impl[2] = self.exec_op02
-    self.op_impl[99] = self.exec_op99
+    self.instr_impl = {}
+    self.instr_impl[1] = self.exec_op01
+    self.instr_impl[2] = self.exec_op02
+    self.instr_impl[99] = self.exec_op99
 
   def load_program(self, prog):
     self.mem = [int(e) for e in prog.split(",")]
     return self.mem
 
   def run(self):
-    self.pc = 0
+    self.ip = 0
     self.halt = False
-    while self.pc < len(self.mem) and not self.halt:
+    while self.ip < len(self.mem) and not self.halt:
       self.step()
     return self.mem
 
   def step(self):
-    op = self.mem[self.pc]
-    self.op_impl[op]()
-    self.pc += 4
+    op = self.mem[self.ip]
+    self.instr_impl[op]()
     return self.mem
 
   def exec_op01(self):
-    operand1 = self.mem[self.pc + 1]
-    operand2 = self.mem[self.pc + 2]
-    dest = self.mem[self.pc + 3]
+    operand1 = self.mem[self.ip + 1]
+    operand2 = self.mem[self.ip + 2]
+    dest = self.mem[self.ip + 3]
     self.mem[dest] = self.mem[operand1] + self.mem[operand2]
+    self.ip += 4
     return self.mem
 
   def exec_op02(self):
-    operand1 = self.mem[self.pc + 1]
-    operand2 = self.mem[self.pc + 2]
-    dest = self.mem[self.pc + 3]
+    operand1 = self.mem[self.ip + 1]
+    operand2 = self.mem[self.ip + 2]
+    dest = self.mem[self.ip + 3]
     self.mem[dest] = self.mem[operand1] * self.mem[operand2]
+    self.ip += 4
     return self.mem
 
   def exec_op99(self):
     self.halt = True
+    self.ip += 1
     return self.mem
 
 
 def main():
-  pass
+  p = """1,0,0,3,1,1,2,3,1,3,4,3,1,5,0,3,2,1,10,19,1,19,6,23,2,23,13,27,1,27,5,
+      31,2,31,10,35,1,9,35,39,1,39,9,43,2,9,43,47,1,5,47,51,2,13,51,55,1,55,9,
+      59,2,6,59,63,1,63,5,67,1,10,67,71,1,71,10,75,2,75,13,79,2,79,13,
+      83,1,5,83,87,1,87,6,91,2,91,13,95,1,5,95,99,1,99,2,103,1,103,6,0,99,2,
+      14,0,0"""
+  cpu = IntcodeComputer()
+  found_it = False
+  for noun in range(0, 100):
+    for verb in range(0, 100):
+      cpu.load_program(p)
+      cpu.mem[1] = noun
+      cpu.mem[2] = verb
+      dump = cpu.run()
+      out = dump[0]
+      if out == 19690720:
+        print(100 * noun + verb)
+        found_it = True
+        break
+    if found_it:
+      break
 
 if __name__ == "__main__":
   doctest.testmod()
