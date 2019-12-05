@@ -1,6 +1,5 @@
 # Lint as: python3
-"""Advent of Code, Day 4 -- Secure container passwords.
-"""
+"""Advent of Code, Day 4 -- Secure container passwords."""
 
 
 import doctest
@@ -58,15 +57,13 @@ def is_ascending(pw):
   return True
 
 
-def possible_passwords(a, b):
-  return (pw for pw
-          in map(str, range(a, b + 1))
+def possible_passwords(lower, upper):
+  return (pw for pw in map(str, range(lower, upper))
           if is_ascending(pw) and has_double(pw))
 
 
-def possible_passwords_strict(a, b):
-  return (pw for pw
-          in map(str, range(a, b + 1))
+def possible_passwords_strict(lower, upper):
+  return (pw for pw in map(str, range(lower, upper))
           if is_ascending(pw) and has_double_strict(pw))
 
 
