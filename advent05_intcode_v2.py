@@ -129,14 +129,20 @@ class IntcodeComputer:
 
   def get_param(self, i):
     if self.param_modes[i] == 0:
-      return self.mem[self.mem[self.ip + i + 1]]
+      return self.get_param_position(i)
     else:
-      return self.mem[self.ip + i + 1]
+      return self.get_param_immediate(i)
+
+  def get_param_position(self, i):
+    return self.mem[self.mem[self.ip + i + 1]]
+
+  def get_param_immediate(self, i):
+    return self.mem[self.ip + i + 1]
 
   def add_instr(self):
     operand1 = self.get_param(0)
     operand2 = self.get_param(1)
-    dest = self.mem[self.ip + 1 + 2]
+    dest = self.get_param_immediate(2)
     self.mem[dest] = operand1 + operand2
     self.ip += 4
     return self.mem
@@ -144,13 +150,13 @@ class IntcodeComputer:
   def mult_instr(self):
     operand1 = self.get_param(0)
     operand2 = self.get_param(1)
-    dest = self.mem[self.ip + 1 + 2]
+    dest = self.get_param_immediate(2)
     self.mem[dest] = operand1 * operand2
     self.ip += 4
     return self.mem
 
   def in_instr(self):
-    dest = self.mem[self.ip + 1]
+    dest = self.get_param_immediate(0)
     self.mem[dest] = self.input
     self.ip += 2
     return self.mem
@@ -163,18 +169,18 @@ class IntcodeComputer:
 
   def jump_true_instr(self):
     val = self.get_param(0)
-    dest = self.get_param(1)
+    target = self.get_param(1)
     if val != 0:
-      self.ip = dest
+      self.ip = target
     else:
       self.ip += 3
     return self.mem
 
   def jump_false_instr(self):
     val = self.get_param(0)
-    dest = self.get_param(1)
+    target = self.get_param(1)
     if val == 0:
-      self.ip = dest
+      self.ip = target
     else:
       self.ip += 3
     return self.mem
@@ -182,7 +188,7 @@ class IntcodeComputer:
   def lessthan_instr(self):
     operand1 = self.get_param(0)
     operand2 = self.get_param(1)
-    dest = self.mem[self.ip + 1 + 2]
+    dest = self.get_param_immediate(2)
     if operand1 < operand2:
       self.mem[dest] = 1
     else:
@@ -193,7 +199,7 @@ class IntcodeComputer:
   def equals_instr(self):
     operand1 = self.get_param(0)
     operand2 = self.get_param(1)
-    dest = self.mem[self.ip + 1 + 2]
+    dest = self.get_param_immediate(2)
     if operand1 == operand2:
       self.mem[dest] = 1
     else:
