@@ -20,14 +20,14 @@ import functools
 
 def check_image(img, w, h):
   layers = layers_from_image(img, w, h)
-  layers.sort(key=lambda x: len(list(filter(lambda y: y == '0', x))))
-  return (len(list(filter(lambda y: y == '1', layers[0])))
-          * len(list(filter(lambda y: y == '2', layers[0]))))
+  layers.sort(key=lambda L: len([p for p in L if p == '0']))
+  return (len([p for p in layers[0] if p == '1'])
+          * len([p for p in layers[0] if p == '2']))
 
 
 def render_image(img, w, h):
   layers = layers_from_image(img, w, h)
-  return functools.reduce(merge_layers, (layers), '2' * w * h)
+  return functools.reduce(merge_layers, layers, '2' * w * h)
 
 
 def layers_from_image(img, w, h):
