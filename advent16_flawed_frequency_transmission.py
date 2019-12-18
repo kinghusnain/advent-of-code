@@ -1,0 +1,50 @@
+# Lint as: python3
+r"""Advent of Code, Day 16 -- Flawed Frequency Transmission.
+
+>>> fft('12345678')
+'48226158'
+>>> fft(fft('12345678'))
+'34040438'
+>>> fft(fft(fft('12345678')))
+'03415518'
+>>> fft(fft(fft(fft('12345678'))))
+'01029498'
+"""
+
+
+import doctest
+
+
+def fft(in_seq):
+  out_seq = [None for _ in range(len(in_seq))]
+  for i in range(len(out_seq)):
+    e = i + 1
+    pattern = [0, 1, 0, -1]
+    pattern = [[n for _ in range(e)] for n in pattern]
+    pattern = [n for sublist in pattern for n in sublist]
+    acc = 0
+    p = 1
+    for j in range(len(in_seq)):
+      mult = pattern[p]
+      p = p + 1 if p + 1 < len(pattern) else 0
+      n = int(in_seq[j])
+      acc += mult * n
+    out_seq[i] = str(acc)[-1]
+  return ''.join(out_seq)
+
+
+def solve_pt1():
+  seq = '59796737047664322543488505082147966997246465580805791578417462788780740484409625674676660947541571448910007002821454068945653911486140823168233915285229075374000888029977800341663586046622003620770361738270014246730936046471831804308263177331723460787712423587453725840042234550299991238029307205348958992794024402253747340630378944672300874691478631846617861255015770298699407254311889484508545861264449878984624330324228278057377313029802505376260196904213746281830214352337622013473019245081834854781277565706545720492282616488950731291974328672252657631353765496979142830459889682475397686651923318015627694176893643969864689257620026916615305397'
+  for _ in range(100):
+    seq = fft(seq)
+  print(seq[:8])
+
+
+def solve_pt2():
+  pass
+
+
+if __name__ == '__main__':
+  doctest.testmod()
+  solve_pt1()
+  solve_pt2()
