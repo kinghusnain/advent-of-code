@@ -1,12 +1,8 @@
-import java.io.File
-
 class Day01 {
     fun part1(entries: List<Int>): Int {
-        for (i in entries.indices) {
-            for (j in entries.indices) {
-                val n: Int = entries[i]
-                val m: Int = entries[j]
-                if (i != j && n + m == 2020) {
+        for (m in entries) {
+            for (n in entries) {
+                if (m != n && n + m == 2020) {
                     return n * m
                 }
             }
@@ -15,13 +11,10 @@ class Day01 {
     }
 
     fun part2(entries: List<Int>): Int {
-        for (i in entries.indices) {
-            for (j in entries.indices) {
-                for (k in entries.indices) {
-                    val n: Int = entries[i]
-                    val m: Int = entries[j]
-                    val o: Int = entries[k]
-                    if (i != j && j != k && i != k && n + m + o == 2020) {
+        for (m in entries) {
+            for (n in entries) {
+                for (o in entries) {
+                    if (m != n && n != o && m != o && n + m + o == 2020) {
                         return n * m * o
                     }
                 }
