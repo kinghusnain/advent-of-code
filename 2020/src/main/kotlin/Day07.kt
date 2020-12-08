@@ -2,8 +2,9 @@ class Day07 {}
 
 data class Bag(val description: String)
 data class AllowedContent(val count: Int, val description: String)
+typealias BagRules = Map<String, List<AllowedContent>>
 
-fun Bag.canContain(bag: String, rules: Map<String, List<AllowedContent>>): Boolean {
+fun Bag.canContain(bag: String, rules: BagRules): Boolean {
     val allowedContents = rules[this.description] ?: throw Exception()
     return when {
         allowedContents.isEmpty() -> false
@@ -14,7 +15,7 @@ fun Bag.canContain(bag: String, rules: Map<String, List<AllowedContent>>): Boole
     }
 }
 
-fun Bag.bagsWithin(rules: Map<String, List<AllowedContent>>): Int {
+fun Bag.bagsWithin(rules: BagRules): Int {
     val allowedContents = rules[this.description] ?: throw Exception()
     return when {
         allowedContents.isEmpty() -> 0
@@ -22,7 +23,7 @@ fun Bag.bagsWithin(rules: Map<String, List<AllowedContent>>): Int {
     }
 }
 
-fun getRules(input: String) = input.split("\n").map { parseRule(it) }.toMap()
+fun getRules(input: String): BagRules = input.split("\n").map { parseRule(it) }.toMap()
 
 val ruleRegex = Regex("""(.+ bag)s contain (.*)\.""")
 val allowedRegex = Regex("""(\d+) (.+?)s?""")
