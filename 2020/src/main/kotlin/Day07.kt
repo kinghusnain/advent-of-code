@@ -1,23 +1,24 @@
 class Day07 {}
 
+data class Bag(val description: String)
 data class AllowedContent(val count: Int, val description: String)
 
-fun String.canContain(bag: String, rules: Map<String, List<AllowedContent>>): Boolean {
-    val allowedContents = rules[this] ?: throw Exception()
+fun Bag.canContain(bag: String, rules: Map<String, List<AllowedContent>>): Boolean {
+    val allowedContents = rules[this.description] ?: throw Exception()
     return when {
         allowedContents.isEmpty() -> false
         bag in allowedContents.map { it.description } -> true
         else -> allowedContents.fold(false) { canContain, allowedContent ->
-            canContain || allowedContent.description.canContain(bag, rules)
+            canContain || Bag(allowedContent.description).canContain(bag, rules)
         }
     }
 }
 
-fun String.bagsWithin(rules: Map<String, List<AllowedContent>>): Int {
-    val allowedContents = rules[this] ?: throw Exception()
+fun Bag.bagsWithin(rules: Map<String, List<AllowedContent>>): Int {
+    val allowedContents = rules[this.description] ?: throw Exception()
     return when {
         allowedContents.isEmpty() -> 0
-        else -> allowedContents.map { it.count * (1 + it.description.bagsWithin(rules)) }.sum()
+        else -> allowedContents.map { it.count * (1 + Bag(it.description).bagsWithin(rules)) }.sum()
     }
 }
 
@@ -42,9 +43,11 @@ fun main() {
     val input = Day07::javaClass.javaClass.classLoader.getResource("day07.txt")?.readText() ?: ""
 
     val rules = getRules(input)
-    val canContainGold = rules.map { it.key }.filter { bag -> bag.canContain("shiny gold bag", rules) }.size
+    val canContainGold = rules.map { it.key }
+        .filter { bag -> Bag(bag).canContain("shiny gold bag", rules) }
+        .size
     println(canContainGold)
 
-    val goldBagContents = "shiny gold bag".bagsWithin(rules)
+    val goldBagContents = Bag("shiny gold bag").bagsWithin(rules)
     println(goldBagContents)
 }
