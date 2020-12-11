@@ -22,32 +22,6 @@ class CompleteAdapterChain(private var adapters: List<Int>) {
     }
 }
 
-//val adapterPathCache = mutableMapOf<List<Int>, List<List<Int>>>()
-//
-//fun List<Int>.adapterPaths(): List<List<Int>> = if (adapterPathCache.containsKey(this)) {
-//    adapterPathCache[this]!!
-//} else {
-//    when (this.size) {
-//        0 -> emptyList()
-//        1 -> listOf(this)
-//        2 -> if (this[1] - this[0] <= 3) listOf(this) else emptyList()
-//        else -> {
-//            val paths = emptyList<List<Int>>().toMutableList()
-//            if (this[1] - this[0] <= 3) {
-//                paths += this.subList(1, this.lastIndex + 1).adapterPaths().map { listOf(this[0]) + it }
-//            }
-//            if (this[2] - this[0] <= 3) {
-//                paths += this.subList(2, this.lastIndex + 1).adapterPaths().map { listOf(this[0]) + it }
-//            }
-//            if (this.size > 3 && this[3] - this[0] <= 3) {
-//                paths += this.subList(3, this.lastIndex + 1).adapterPaths().map { listOf(this[0]) + it }
-//            }
-//            adapterPathCache[this] = paths
-//            paths
-//        }
-//    }
-//}
-
 class AdapterCollection(private val adapters: MutableList<Int>) {
     private val numPathCache = emptyMap<Int, BigInteger>().toMutableMap()
 
