@@ -10,15 +10,13 @@ class SeatMap(private val seatStatus: List<List<Char>>) {
             .flatten()
             .filter { it != Pair(y, x) }
 
-    private fun isEmptyAndAlone(y: Int, x: Int): Boolean {
-        return (seatStatus[y][x] == 'L'
+    private fun isEmptyAndAlone(y: Int, x: Int) =
+        (seatStatus[y][x] == 'L'
                 && adjacentSeats(y, x).none { seat -> seatStatus[seat.first][seat.second] == '#' })
-    }
 
-    private fun isCrowded(y: Int, x: Int): Boolean {
-        return (seatStatus[y][x] == '#'
+    private fun isCrowded(y: Int, x: Int) =
+        (seatStatus[y][x] == '#'
                 && adjacentSeats(y, x).filter { seat -> seatStatus[seat.first][seat.second] == '#' }.size >= 4)
-    }
 
     fun next(): SeatMap {
         val after = seatStatus.map { it.map { c -> c }.toMutableList() }.toMutableList()
@@ -35,111 +33,120 @@ class SeatMap(private val seatStatus: List<List<Char>>) {
     }
 
     override fun toString() = seatStatus.joinToString("") { it.joinToString("") }
+    override fun hashCode() = toString().hashCode()
     override fun equals(other: Any?) = toString() == other.toString()
 }
 
 class SeatMapV2(private val seatStatus: List<List<Char>>) {
-    fun visibleSeats(y: Int, x: Int): List<Pair<Int, Int>> {
-        var nwSeat: Pair<Int, Int>? = null
+    private fun visibleSeats(y: Int, x: Int) = listOfNotNull(
+        visibleNW(y, x), visibleN(y, x), visibleNE(y, x),
+        visibleW(y, x), visibleE(y, x),
+        visibleSW(y, x), visibleS(y, x), visibleSE(y, x)
+    )
+
+    private fun visibleNW(y: Int, x: Int): Pair<Int, Int>? {
         var nwY = y - 1
         var nwX = x - 1
         while (nwY >= 0 && nwX >= 0) {
             if (seatStatus[nwY][nwX] != '.') {
-                nwSeat = Pair(nwY, nwX)
-                break
+                return Pair(nwY, nwX)
             }
             nwY--
             nwX--
         }
+        return null
+    }
 
-        var nSeat: Pair<Int, Int>? = null
+    private fun visibleN(y: Int, x: Int): Pair<Int, Int>? {
         var nY = y - 1
         while (nY >= 0) {
             if (seatStatus[nY][x] != '.') {
-                nSeat = Pair(nY, x)
-                break
+                return Pair(nY, x)
             }
             nY--
         }
+        return null
+    }
 
-        var neSeat: Pair<Int, Int>? = null
+    private fun visibleNE(y: Int, x: Int): Pair<Int, Int>? {
         var neY = y - 1
         var neX = x + 1
         while (neY >= 0 && neX < seatStatus[0].size) {
             if (seatStatus[neY][neX] != '.') {
-                neSeat = Pair(neY, neX)
-                break
+                return Pair(neY, neX)
             }
             neY--
             neX++
         }
+        return null
+    }
 
-        var wSeat: Pair<Int, Int>? = null
+    private fun visibleW(y: Int, x: Int): Pair<Int, Int>? {
         var wX = x - 1
         while (wX >= 0) {
             if (seatStatus[y][wX] != '.') {
-                wSeat = Pair(y, wX)
-                break
+                return Pair(y, wX)
             }
             wX--
         }
+        return null
+    }
 
-        var eSeat: Pair<Int, Int>? = null
+    private fun visibleE(y: Int, x: Int): Pair<Int, Int>? {
         var eX = x + 1
         while (eX < seatStatus[0].size) {
             if (seatStatus[y][eX] != '.') {
-                eSeat = Pair(y, eX)
-                break
+                return Pair(y, eX)
             }
             eX++
         }
+        return null
+    }
 
-        var swSeat: Pair<Int, Int>? = null
+    private fun visibleSW(y: Int, x: Int): Pair<Int, Int>? {
         var swY = y + 1
         var swX = x - 1
         while (swY < seatStatus.size && swX >= 0) {
             if (seatStatus[swY][swX] != '.') {
-                swSeat = Pair(swY, swX)
-                break
+                return Pair(swY, swX)
             }
             swY++
             swX--
         }
+        return null
+    }
 
-        var sSeat: Pair<Int, Int>? = null
+    private fun visibleS(y: Int, x: Int): Pair<Int, Int>? {
         var sY = y + 1
         while (sY < seatStatus.size) {
             if (seatStatus[sY][x] != '.') {
-                sSeat = Pair(sY, x)
-                break
+                return Pair(sY, x)
             }
             sY++
         }
+        return null
+    }
 
-        var seSeat: Pair<Int, Int>? = null
+    private fun visibleSE(y: Int, x: Int): Pair<Int, Int>? {
         var seY = y + 1
         var seX = x + 1
         while (seY < seatStatus.size && seX < seatStatus[0].size) {
             if (seatStatus[seY][seX] != '.') {
-                seSeat = Pair(seY, seX)
-                break
+                return Pair(seY, seX)
             }
             seY++
             seX++
         }
-
-        return listOfNotNull(nwSeat, nSeat, neSeat, wSeat, eSeat, swSeat, sSeat, seSeat)
+        return null
     }
 
-    private fun isEmptyAndAlone(y: Int, x: Int): Boolean {
-        return (seatStatus[y][x] == 'L'
+    private fun isEmptyAndAlone(y: Int, x: Int) =
+        (seatStatus[y][x] == 'L'
                 && visibleSeats(y, x).none { seat -> seatStatus[seat.first][seat.second] == '#' })
-    }
 
-    private fun isCrowded(y: Int, x: Int): Boolean {
-        return (seatStatus[y][x] == '#'
+    private fun isCrowded(y: Int, x: Int) =
+        (seatStatus[y][x] == '#'
                 && visibleSeats(y, x).filter { seat -> seatStatus[seat.first][seat.second] == '#' }.size >= 5)
-    }
 
     fun next(): SeatMapV2 {
         val after = seatStatus.map { it.map { c -> c }.toMutableList() }.toMutableList()
@@ -156,6 +163,7 @@ class SeatMapV2(private val seatStatus: List<List<Char>>) {
     }
 
     override fun toString() = seatStatus.joinToString("") { it.joinToString("") }
+    override fun hashCode() = toString().hashCode()
     override fun equals(other: Any?) = toString() == other.toString()
 }
 
