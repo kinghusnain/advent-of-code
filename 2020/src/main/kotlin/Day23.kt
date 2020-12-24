@@ -19,13 +19,13 @@ fun List<Long>.cupGameTransform(): List<Long> {
 class CupGameLL(initialCups: List<Long>) {
     data class Cup(val value: Long, var next: Cup?)
     private var current: Cup? = Cup(initialCups[0], null)
-    private val indexOfCup = mutableMapOf(initialCups[0] to current)
+    private val cupWithLabel = mutableMapOf(initialCups[0] to current)
 
     init {
         var last = current
         for (n in initialCups.subList(1, initialCups.size)) {
-            indexOfCup[n] = Cup(n, null)
-            last?.next = indexOfCup[n]
+            cupWithLabel[n] = Cup(n, null)
+            last?.next = cupWithLabel[n]
             last = last?.next
         }
         last?.next = current
@@ -51,9 +51,9 @@ class CupGameLL(initialCups: List<Long>) {
                                   removed?.value,
                                   removed?.next?.value,
                                   removed?.next?.next?.value)) {
-            destVal = if (destVal > 1) destVal - 1 else indexOfCup.keys.maxOrNull()!!
+            destVal = if (destVal > 1) destVal - 1 else cupWithLabel.keys.maxOrNull()!!
         }
-        val destination = indexOfCup[destVal]!!
+        val destination = cupWithLabel[destVal]!!
 
         removed?.next?.next?.next = destination.next
         destination.next = removed
