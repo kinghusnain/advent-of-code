@@ -1,6 +1,7 @@
 class Position {
   int horizontal = 0;
   int depth = 0;
+  int aim = 0;
 }
 
 class Command {
@@ -25,6 +26,27 @@ Position calculatePosition(Iterable<Command> course) {
         break;
       case Direction.up:
         position.depth -= command.magnitude;
+        break;
+    }
+  }
+
+  return position;
+}
+
+Position calculatePositionMk2(Iterable<Command> course) {
+  Position position = Position();
+
+  for (final command in course) {
+    switch (command.direction) {
+      case Direction.forward:
+        position.horizontal += command.magnitude;
+        position.depth += position.aim * command.magnitude;
+        break;
+      case Direction.down:
+        position.aim += command.magnitude;
+        break;
+      case Direction.up:
+        position.aim -= command.magnitude;
         break;
     }
   }

@@ -14,4 +14,10 @@ forward 2'''
     final position = calculatePosition(commands);
     expect(position.horizontal * position.depth, 150);
   });
+
+  test('Part 2 example', () {
+    final commands = commandsFromLines(input);
+    final position = calculatePositionMk2(commands);
+    expect(position.horizontal * position.depth, 900);
+  });
 }
