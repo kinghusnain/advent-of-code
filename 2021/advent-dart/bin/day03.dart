@@ -6,4 +6,6 @@ void main(List<String> args) {
   final input = File('puzzle_input/day03.txt').readAsLinesSync();
   final pt1Soln = powerConsumption(input);
   print(pt1Soln);
+  final pt2Soln = lifeSupportRating(input);
+  print(pt2Soln);
 }

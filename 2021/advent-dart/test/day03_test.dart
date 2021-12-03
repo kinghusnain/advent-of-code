@@ -20,5 +20,7 @@ void main() {
     expect(powerConsumption(input), 198);
   });
 
-  test('Part 2 example', () {});
+  test('Part 2 example', () {
+    expect(lifeSupportRating(input), 230);
+  });
 }
