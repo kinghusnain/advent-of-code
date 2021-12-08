@@ -13,4 +13,9 @@ void main(List<String> args) {
         .length;
   }).reduce((value, element) => value + element);
   print(num1478s);
+
+  final sumOfDecoded = input
+      .map((e) => int.parse(e.decode()))
+      .reduce((value, element) => value + element);
+  print(sumOfDecoded);
 }

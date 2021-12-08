@@ -25,4 +25,11 @@ gcafb gcf dcaebfg ecagb gf abcdeg gaef cafbge fdbac fegbdc | fgae cfgab fg bagce
     }).reduce((value, element) => value + element);
     expect(num1478s, 26);
   });
+
+  test('Part 2 example', () {
+    final sumOfDecoded = input
+        .map((e) => int.parse(e.decode()))
+        .reduce((value, element) => value + element);
+    expect(sumOfDecoded, 61229);
+  });
 }
