@@ -1,3 +1,7 @@
+import 'dart:math';
+
+typedef Pt = Point<int>;
+
 class HeightMap {
   final List<List<int>> _map;
   late final int _xSize;
@@ -13,34 +17,49 @@ class HeightMap {
     _xSize = _ySize > 0 ? _map[0].length : 0;
   }
 
-  Iterable<List<int>> adjacentTo(int x, int y) sync* {
-    if (y > 0) yield [x, y - 1]; // Top
-    if (x > 0) yield [x - 1, y]; // Left
-    if (y < _ySize - 1) yield [x, y + 1]; // Bottom
-    if (x < _xSize - 1) yield [x + 1, y]; // Right
+  Iterable<Pt> adjacentTo(Pt pt) sync* {
+    if (pt.y > 0) yield Pt(pt.x, pt.y - 1); // Top
+    if (pt.x > 0) yield Pt(pt.x - 1, pt.y); // Left
+    if (pt.y < _ySize - 1) yield Pt(pt.x, pt.y + 1); // Bottom
+    if (pt.x < _xSize - 1) yield Pt(pt.x + 1, pt.y); // Right
   }
 
-  bool isLowPoint(int x, int y) {
-    final height = _map[y][x];
-    for (final adjPt in adjacentTo(x, y)) {
-      final adjX = adjPt[0];
-      final adjY = adjPt[1];
-      if (height >= _map[adjY][adjX]) return false;
+  bool isLowPoint(Pt pt) {
+    for (final adj in adjacentTo(pt)) {
+      if (heightAt(pt) >= heightAt(adj)) return false;
     }
     return true;
   }
 
-  Iterable<List<int>> lowPoints() sync* {
+  Iterable<Pt> lowPoints() sync* {
     for (var y = 0; y < _ySize; y++) {
       for (var x = 0; x < _xSize; x++) {
-        if (isLowPoint(x, y)) yield [x, y];
+        final pt = Pt(x, y);
+        if (isLowPoint(pt)) yield pt;
       }
     }
   }
 
-  int riskOf(int x, int y) => 1 + _map[y][x];
+  int heightAt(Pt pt) => _map[pt.y][pt.x];
 
-  int get totalRisk => lowPoints()
-      .map((p) => riskOf(p[0], p[1]))
-      .reduce((value, element) => value + element);
+  int riskOf(Pt pt) => 1 + heightAt(pt);
+
+  int get totalRisk =>
+      lowPoints().map(riskOf).reduce((value, element) => value + element);
+
+  Iterable<Pt> upstreamOf(Pt pt) sync* {
+    for (final adjUpstream
+        in adjacentTo(pt).where((adj) => heightAt(adj) > heightAt(pt))) {
+      yield adjUpstream;
+      for (final farUpstream in upstreamOf(adjUpstream)) {
+        yield farUpstream;
+      }
+    }
+  }
+
+  Set<Pt> basinOf(Pt pt) =>
+      {pt, ...upstreamOf(pt).where((p) => heightAt(p) < 9)};
+
+  Iterable<int> basinSizes() =>
+      lowPoints().map((pt) => basinOf(pt)).map((basin) => basin.length);
 }

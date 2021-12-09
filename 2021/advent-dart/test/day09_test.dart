@@ -12,4 +12,17 @@ void main() {
     final hmap = HeightMap(input);
     expect(hmap.totalRisk, 15);
   });
+
+  test('Part 2 example', () {
+    final hmap = HeightMap(input);
+    expect(hmap.basinOf(Pt(1, 0)).length, 3);
+    expect(hmap.basinOf(Pt(9, 0)).length, 9);
+    expect(hmap.basinOf(Pt(2, 2)).length, 14);
+    expect(hmap.basinOf(Pt(6, 4)).length, 9);
+
+    final basins = hmap.basinSizes().toList();
+    basins.sort((a, b) => b - a);
+    final answer = basins.sublist(0, 3).reduce((v, e) => v * e);
+    expect(answer, 1134);
+  });
 }
