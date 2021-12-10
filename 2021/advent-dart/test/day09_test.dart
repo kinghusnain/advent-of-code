@@ -9,12 +9,12 @@ void main() {
 9899965678''';
 
   test('Part 1 example', () {
-    final hmap = HeightMap(input);
+    final hmap = HeightMap.parse(input);
     expect(hmap.totalRisk, 15);
   });
 
   test('Part 2 example', () {
-    final hmap = HeightMap(input);
+    final hmap = HeightMap.parse(input);
     expect(hmap.basinOf(Pt(1, 0)).length, 3);
     expect(hmap.basinOf(Pt(9, 0)).length, 9);
     expect(hmap.basinOf(Pt(2, 2)).length, 14);

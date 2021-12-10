@@ -7,14 +7,14 @@ class HeightMap {
   late final int _xSize;
   late final int _ySize;
 
-  HeightMap(String mapStr)
-      : _map = mapStr
+  HeightMap.parse(String mapString)
+      : _map = mapString
             .trim()
             .split('\n')
             .map((row) => row.split('').map(int.parse).toList(growable: false))
             .toList(growable: false) {
     _ySize = _map.length;
-    _xSize = _ySize > 0 ? _map[0].length : 0;
+    _xSize = _map.isNotEmpty ? _map.first.length : 0;
   }
 
   Iterable<Pt> adjacentTo(Pt pt) sync* {
@@ -24,12 +24,9 @@ class HeightMap {
     if (pt.x < _xSize - 1) yield Pt(pt.x + 1, pt.y); // Right
   }
 
-  bool isLowPoint(Pt pt) {
-    for (final adj in adjacentTo(pt)) {
-      if (heightAt(pt) >= heightAt(adj)) return false;
-    }
-    return true;
-  }
+  bool isLowPoint(Pt pt) => adjacentTo(pt)
+      .map((adj) => heightAt(pt) < heightAt(adj))
+      .reduce((value, element) => value && element);
 
   Iterable<Pt> lowPoints() sync* {
     for (var y = 0; y < _ySize; y++) {
@@ -61,5 +58,5 @@ class HeightMap {
       {pt, ...upstreamOf(pt).where((p) => heightAt(p) < 9)};
 
   Iterable<int> basinSizes() =>
-      lowPoints().map((pt) => basinOf(pt)).map((basin) => basin.length);
+      lowPoints().map(basinOf).map((basin) => basin.length);
 }
