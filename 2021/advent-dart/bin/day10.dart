@@ -7,4 +7,12 @@ void main(List<String> args) {
   final totalScore =
       input.map(errorScore).reduce((value, element) => value + element);
   print(totalScore);
+
+  final scores = input
+      .where((chunk) => errorScore(chunk) == 0)
+      .map(autoCompleteScore)
+      .toList();
+  scores.sort();
+  final middleScore = scores[scores.length ~/ 2];
+  print(middleScore);
 }
