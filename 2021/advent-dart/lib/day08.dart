@@ -1,74 +1,74 @@
 class SevenSegmentDisplaySolver {
-  // 0: 6 segments, not 9, contains 1
-  // 1: 2 segments
-  // 2: 5 segments,
-  // 3: 5 segments, contains 1
-  // 4: 4 segments
-  // 5: 5 segments,
-  // 6: 6 segments, not 9, not 0
-  // 7: 3 segments
-  // 8: 7 segments
-  // 9: 6 segments, contains 4
-  final List<String?> ssdRepresentations = List.filled(10, null);
+  // 0: 6 segments, not 9, superset of 1.
+  // 1: 2 segments.
+  // 2: 5 segments, not 3, not 5.
+  // 3: 5 segments, superset of 1.
+  // 4: 4 segments.
+  // 5: 5 segments, subset of 6.
+  // 6: 6 segments, not 9, not 0.
+  // 7: 3 segments.
+  // 8: 7 segments.
+  // 9: 6 segments, superset of 4.
+  final List<String?> _ssdRepresentations = List.filled(10, null);
   final Map<String, int> decoder = {};
 
-  SevenSegmentDisplaySolver(List<String> uniquePatterns) {
-    ssdRepresentations[1] = uniquePatterns
+  SevenSegmentDisplaySolver(Set<String> uniquePatterns) {
+    _ssdRepresentations[1] = uniquePatterns
         .where((pattern) => pattern.length == 2)
-        .firstAndOnly()
+        .single
         .alphabetized();
-    ssdRepresentations[4] = uniquePatterns
+    _ssdRepresentations[4] = uniquePatterns
         .where((pattern) => pattern.length == 4)
-        .firstAndOnly()
+        .single
         .alphabetized();
-    ssdRepresentations[7] = uniquePatterns
+    _ssdRepresentations[7] = uniquePatterns
         .where((pattern) => pattern.length == 3)
-        .firstAndOnly()
+        .single
         .alphabetized();
-    ssdRepresentations[8] = uniquePatterns
+    _ssdRepresentations[8] = uniquePatterns
         .where((pattern) => pattern.length == 7)
-        .firstAndOnly()
+        .single
         .alphabetized();
-    ssdRepresentations[9] = uniquePatterns
+    _ssdRepresentations[9] = uniquePatterns
         .where((pattern) => pattern.length == 6)
         .map((e) => e.alphabetized())
         .where((pattern) =>
-            pattern.toSet().containsAll(ssdRepresentations[4]!.toSet()))
-        .firstAndOnly();
-    ssdRepresentations[0] = uniquePatterns
+            pattern.toSet().containsAll(_ssdRepresentations[4]!.toSet()))
+        .single;
+    _ssdRepresentations[0] = uniquePatterns
         .where((pattern) => pattern.length == 6)
         .map((e) => e.alphabetized())
-        .where((pattern) => pattern != ssdRepresentations[9])
+        .where((pattern) => pattern != _ssdRepresentations[9])
         .where((pattern) =>
-            pattern.toSet().containsAll(ssdRepresentations[1]!.toSet()))
-        .firstAndOnly();
-    ssdRepresentations[6] = uniquePatterns
+            pattern.toSet().containsAll(_ssdRepresentations[1]!.toSet()))
+        .single;
+    _ssdRepresentations[6] = uniquePatterns
         .where((pattern) => pattern.length == 6)
         .map((e) => e.alphabetized())
-        .where((pattern) => pattern != ssdRepresentations[9])
-        .where((pattern) => pattern != ssdRepresentations[0])
-        .firstAndOnly();
-    ssdRepresentations[3] = uniquePatterns
+        .where((pattern) => pattern != _ssdRepresentations[9])
+        .where((pattern) => pattern != _ssdRepresentations[0])
+        .single;
+    _ssdRepresentations[3] = uniquePatterns
         .where((pattern) => pattern.length == 5)
         .map((e) => e.alphabetized())
         .where((pattern) =>
-            pattern.toSet().containsAll(ssdRepresentations[1]!.toSet()))
-        .firstAndOnly();
-    ssdRepresentations[5] = uniquePatterns
+            pattern.toSet().containsAll(_ssdRepresentations[1]!.toSet()))
+        .single;
+    _ssdRepresentations[5] = uniquePatterns
         .where((pattern) => pattern.length == 5)
         .map((e) => e.alphabetized())
         .where((pattern) =>
-            ssdRepresentations[6]!.toSet().containsAll(pattern.toSet()))
-        .firstAndOnly();
-    ssdRepresentations[2] = uniquePatterns
+            _ssdRepresentations[6]!.toSet().containsAll(pattern.toSet()))
+        .single;
+    _ssdRepresentations[2] = uniquePatterns
         .where((pattern) => pattern.length == 5)
         .map((e) => e.alphabetized())
-        .where((pattern) => pattern != ssdRepresentations[5])
-        .where((pattern) => pattern != ssdRepresentations[3])
-        .firstAndOnly();
+        .where((pattern) => pattern != _ssdRepresentations[5])
+        .where((pattern) => pattern != _ssdRepresentations[3])
+        .single;
 
     for (var i = 0; i < 10; i++) {
-      decoder[ssdRepresentations[i]!] = i;
+      decoder[_ssdRepresentations[i]!] = i;
     }
   }
 }
@@ -79,13 +79,13 @@ Iterable<String> oneFourSevenEight(Iterable<String> uniquePatterns) =>
         .map((pattern) => pattern.alphabetized());
 
 class LogEntry {
-  late List<String> uniquePatterns;
+  late Set<String> uniquePatterns;
   late List<String> outputs;
 
   LogEntry(this.uniquePatterns, this.outputs);
   LogEntry.parse(String string) {
     final sections = string.split(' | ');
-    uniquePatterns = sections[0].split(' ');
+    uniquePatterns = sections[0].split(' ').toSet();
     outputs = sections[1].split(' ');
   }
 
@@ -103,11 +103,4 @@ extension StringUtils on String {
   }
 
   Set<String> toSet() => Set.from(split(''));
-}
-
-extension IterUtils<T> on Iterable<T> {
-  T firstAndOnly() {
-    if (length != 1) throw Exception();
-    return first;
-  }
 }

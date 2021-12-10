@@ -6,8 +6,8 @@ class FishPopulationModel {
   final List<int> fishAtStage;
 
   FishPopulationModel({this.normalCycleLength = 7, this.newbornCycleLength = 9})
-      : fishAtStage =
-            List.filled(max(normalCycleLength, newbornCycleLength), 0);
+      : fishAtStage = List.filled(max(normalCycleLength, newbornCycleLength), 0,
+            growable: true);
 
   int get population => fishAtStage.reduce((value, element) => value + element);
 
@@ -16,11 +16,9 @@ class FishPopulationModel {
   }
 
   void ffwd(int days) {
-    for (var d = 0; d < days; d++) {
-      final newFish = fishAtStage[0];
-      for (var i = 0; i < fishAtStage.length - 1; i++) {
-        fishAtStage[i] = fishAtStage[i + 1];
-      }
+    for (var _ = 0; _ < days; _++) {
+      final newFish = fishAtStage.removeAt(0);
+      fishAtStage.add(0);
       fishAtStage[normalCycleLength - 1] += newFish;
       fishAtStage[newbornCycleLength - 1] = newFish;
     }
