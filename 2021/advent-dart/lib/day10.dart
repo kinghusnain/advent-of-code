@@ -62,16 +62,7 @@ int autoCompleteScore(String chunk) {
   var score = 0;
   while (openChunks.isNotEmpty) {
     final c = openChunks.removeLast();
-    switch (c) {
-      case '(':
-      case '[':
-      case '{':
-      case '<':
-        score = 5 * score + charCompletionPoints[c]!;
-        break;
-      default:
-        throw Exception();
-    }
+    score = 5 * score + charCompletionPoints[c]!;
   }
   return score;
 }
