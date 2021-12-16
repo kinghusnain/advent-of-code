@@ -1,8 +1,15 @@
 abstract class PacketType {
+  static const sum = 0;
+  static const product = 1;
+  static const minimum = 2;
+  static const maximum = 3;
   static const literal = 4;
+  static const greaterThan = 5;
+  static const lessThan = 6;
+  static const equals = 7;
 }
 
-class Packet {
+abstract class Packet {
   late final int version;
   late final int type;
   late final String unparsed;
@@ -11,8 +18,22 @@ class Packet {
     switch (typeOf(binString)) {
       case PacketType.literal:
         return LiteralPacket.parse(binString);
+      case PacketType.sum:
+        return SumPacket.parse(binString);
+      case PacketType.product:
+        return ProductPacket.parse(binString);
+      case PacketType.minimum:
+        return MinPacket.parse(binString);
+      case PacketType.maximum:
+        return MaxPacket.parse(binString);
+      case PacketType.greaterThan:
+        return GreaterThanPacket.parse(binString);
+      case PacketType.lessThan:
+        return LessThanPacket.parse(binString);
+      case PacketType.equals:
+        return EqualsPacket.parse(binString);
       default:
-        return OperatorPacket.parse(binString);
+        throw Exception();
     }
   }
 
@@ -24,6 +45,8 @@ class Packet {
   Iterable<Packet> decendPacketTree() sync* {
     yield this;
   }
+
+  int eval();
 }
 
 class LiteralPacket extends Packet {
@@ -46,6 +69,9 @@ class LiteralPacket extends Packet {
     value = v;
     unparsed = binString.substring(5);
   }
+
+  @override
+  int eval() => value;
 }
 
 class OperatorPacket extends Packet {
@@ -97,6 +123,77 @@ class OperatorPacket extends Packet {
       }
     }
   }
+
+  @override
+  int eval() {
+    throw UnimplementedError();
+  }
+}
+
+class SumPacket extends OperatorPacket {
+  SumPacket.parse(String binString) : super.parse(binString);
+
+  @override
+  int eval() => subPackets.fold(0, (sum, packet) => sum + packet.eval());
+}
+
+class ProductPacket extends OperatorPacket {
+  ProductPacket.parse(String binString) : super.parse(binString);
+
+  @override
+  int eval() =>
+      subPackets.fold(1, (product, packet) => product * packet.eval());
+}
+
+class MinPacket extends OperatorPacket {
+  MinPacket.parse(String binString) : super.parse(binString);
+
+  @override
+  int eval() => subPackets.fold(null, (int? min, packet) {
+        final val = packet.eval();
+        if (min != null) {
+          return val < min ? val : min;
+        } else {
+          return val;
+        }
+      })!;
+}
+
+class MaxPacket extends OperatorPacket {
+  MaxPacket.parse(String binString) : super.parse(binString);
+
+  @override
+  int eval() => subPackets.fold(0, (max, packet) {
+        final val = packet.eval();
+        return val > max ? val : max;
+      });
+}
+
+class GreaterThanPacket extends OperatorPacket {
+  GreaterThanPacket.parse(String binString) : super.parse(binString) {
+    if (subPackets.length != 2) throw Exception();
+  }
+
+  @override
+  int eval() => subPackets[0].eval() > subPackets[1].eval() ? 1 : 0;
+}
+
+class LessThanPacket extends OperatorPacket {
+  LessThanPacket.parse(String binString) : super.parse(binString) {
+    if (subPackets.length != 2) throw Exception();
+  }
+
+  @override
+  int eval() => subPackets[0].eval() < subPackets[1].eval() ? 1 : 0;
+}
+
+class EqualsPacket extends OperatorPacket {
+  EqualsPacket.parse(String binString) : super.parse(binString) {
+    if (subPackets.length != 2) throw Exception();
+  }
+
+  @override
+  int eval() => subPackets[0].eval() == subPackets[1].eval() ? 1 : 0;
 }
 
 extension HexToBin on String {

@@ -61,4 +61,15 @@ void main() {
         .reduce((value, element) => value + element);
     expect(versionSum, 31);
   });
+
+  test('Part 2 examples', () {
+    expect(Packet.parse('C200B40A82'.hexToBin()).eval(), 3);
+    expect(Packet.parse('04005AC33890'.hexToBin()).eval(), 54);
+    expect(Packet.parse('880086C3E88112'.hexToBin()).eval(), 7);
+    expect(Packet.parse('CE00C43D881120'.hexToBin()).eval(), 9);
+    expect(Packet.parse('D8005AC2A8F0'.hexToBin()).eval(), 1);
+    expect(Packet.parse('F600BC2D8F'.hexToBin()).eval(), 0);
+    expect(Packet.parse('9C005AC2F8F0'.hexToBin()).eval(), 0);
+    expect(Packet.parse('9C0141080250320F1802104A08'.hexToBin()).eval(), 1);
+  });
 }

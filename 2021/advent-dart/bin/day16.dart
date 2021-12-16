@@ -10,4 +10,5 @@ void main(List<String> args) {
       .map((p) => p.version)
       .reduce((value, element) => value + element);
   print(versionSum);
+  print(packet.eval());
 }
