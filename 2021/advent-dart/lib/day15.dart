@@ -1,4 +1,6 @@
+import 'dart:io';
 import 'dart:math';
+import 'package:collection/collection.dart';
 
 typedef Pt = Point<int>;
 
@@ -8,6 +10,7 @@ class DangerousCavern {
   late final int _ySize;
   late final Pt _exit;
 
+  DangerousCavern();
   DangerousCavern.parse(String mapString) {
     final map = mapString
         .trim()
@@ -34,7 +37,7 @@ class DangerousCavern {
   List<Pt> shortestPathToExit() => dijkstra(Pt(0, 0), _exit);
 
   List<Pt> dijkstra(Pt start, Pt goal) {
-    final openSet = _dangerMap.keys.toList();
+    final openSet = {start};
     final Map<Pt, Pt> cameFrom = {};
 
     final distancesTo = Map.fromIterables(
@@ -42,8 +45,8 @@ class DangerousCavern {
     distancesTo[start] = 0;
 
     while (openSet.isNotEmpty) {
-      openSet.sort((pt1, pt2) => distancesTo[pt1]! - distancesTo[pt2]!);
-      final u = openSet.first;
+      final u = openSet.reduce((value, element) =>
+          distancesTo[value]! < distancesTo[element]! ? value : element);
       openSet.removeWhere((pt) => pt == u);
 
       if (u == goal) return reconstructPath(cameFrom, u);
@@ -53,6 +56,7 @@ class DangerousCavern {
         if (alt < distancesTo[v]!) {
           distancesTo[v] = alt;
           cameFrom[v] = u;
+          openSet.add(v);
         }
       }
     }
@@ -73,4 +77,30 @@ class DangerousCavern {
       .sublist(1)
       .map((pt) => _dangerMap[pt]!)
       .fold(0, (value, element) => value + element);
+}
+
+class BigDangerousCavern extends DangerousCavern {
+  BigDangerousCavern.parse(String mapString) : super() {
+    final map = mapString
+        .trim()
+        .split('\n')
+        .map((row) => row.split('').map(int.parse).toList())
+        .toList();
+    final baseXSize = map.isNotEmpty ? map.first.length : 0;
+    final baseYSize = map.length;
+    for (var y = 0; y < baseYSize; y++) {
+      for (var x = 0; x < baseXSize; x++) {
+        for (var yn = 0; yn < 5; yn++) {
+          for (var xn = 0; xn < 5; xn++) {
+            var val = (map[y][x] + xn + yn);
+            while (val > 9) val = (val % 10) + 1;
+            _dangerMap[Pt(x + xn * baseXSize, y + yn * baseYSize)] = val;
+          }
+        }
+      }
+    }
+    _xSize = 5 * baseXSize;
+    _ySize = 5 * baseYSize;
+    _exit = Pt(_xSize - 1, _ySize - 1);
+  }
 }

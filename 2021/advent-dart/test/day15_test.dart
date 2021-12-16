@@ -19,4 +19,11 @@ void main() {
     final cost = cavern.costOfPath(path);
     expect(cost, 40);
   });
+
+  test('Part 2 example', () {
+    final cavern = BigDangerousCavern.parse(input);
+    final path = cavern.shortestPathToExit();
+    final cost = cavern.costOfPath(path);
+    expect(cost, 315);
+  });
 }
