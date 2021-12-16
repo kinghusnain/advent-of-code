@@ -7,8 +7,6 @@ class DangerousCavern {
   late final int _xSize;
   late final int _ySize;
   late final Pt _exit;
-  late final int _worstPossibleScore;
-  final Map<Pt, int> _leastRiskFrom = {};
 
   DangerousCavern.parse(String mapString) {
     final map = mapString
@@ -24,9 +22,6 @@ class DangerousCavern {
         _dangerMap[Pt(x, y)] = map[y][x];
       }
     }
-    _worstPossibleScore = _dangerMap.keys
-        .map((pt) => _dangerMap[pt]!)
-        .reduce((value, element) => value + element);
   }
 
   Iterable<Pt> pointsAdjacentTo(Pt pt) sync* {
@@ -36,25 +31,46 @@ class DangerousCavern {
     if (pt.x < _xSize - 1) yield Pt(pt.x + 1, pt.y); // Right
   }
 
-  int leastRiskToExit(List<Pt> pathSoFar, int dangerSoFar) {
-    final origin = pathSoFar.first;
-    final here = pathSoFar.last;
+  List<Pt> shortestPathToExit() => dijkstra(Pt(0, 0), _exit);
 
-    if (here == _exit) {
-      if (dangerSoFar < (_leastRiskFrom[origin] ?? _worstPossibleScore)) {
-        _leastRiskFrom[origin] = dangerSoFar;
+  List<Pt> dijkstra(Pt start, Pt goal) {
+    final openSet = _dangerMap.keys.toList();
+    final Map<Pt, Pt> cameFrom = {};
+
+    final distancesTo = Map.fromIterables(
+        _dangerMap.keys, List.filled(_dangerMap.length, _xSize * _ySize * 9));
+    distancesTo[start] = 0;
+
+    while (openSet.isNotEmpty) {
+      openSet.sort((pt1, pt2) => distancesTo[pt1]! - distancesTo[pt2]!);
+      final u = openSet.first;
+      openSet.removeWhere((pt) => pt == u);
+
+      if (u == goal) return reconstructPath(cameFrom, u);
+
+      for (var v in pointsAdjacentTo(u)) {
+        final alt = distancesTo[u]! + _dangerMap[v]!;
+        if (alt < distancesTo[v]!) {
+          distancesTo[v] = alt;
+          cameFrom[v] = u;
+        }
       }
-      return dangerSoFar;
-    }
-    if (dangerSoFar >= (_leastRiskFrom[origin] ?? _worstPossibleScore)) {
-      return _worstPossibleScore;
     }
 
-    final exits =
-        pointsAdjacentTo(here).where((pt) => !pathSoFar.contains(pt)).toList();
-    exits.sort((p2, p1) => (p1.y + p1.x) - (p2.y + p2.x));
-    final scores = exits.map((pt) =>
-        leastRiskToExit(pathSoFar + [pt], dangerSoFar + _dangerMap[pt]!));
-    return scores.fold(_worstPossibleScore, min);
+    throw Exception();
   }
+
+  List<Pt> reconstructPath(Map<Pt, Pt> cameFrom, Pt current) {
+    final totalPath = [current];
+    while (cameFrom.containsKey(current)) {
+      current = cameFrom[current]!;
+      totalPath.insert(0, current);
+    }
+    return totalPath;
+  }
+
+  int costOfPath(List<Pt> path) => path
+      .sublist(1)
+      .map((pt) => _dangerMap[pt]!)
+      .fold(0, (value, element) => value + element);
 }
