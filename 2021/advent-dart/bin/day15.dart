@@ -6,12 +6,10 @@ void main(List<String> args) {
   final input = File('puzzle_input/day15.txt').readAsStringSync();
 
   var cavern = DangerousCavern.parse(input);
-  var path = cavern.shortestPathToExit();
-  var cost = cavern.costOfPath(path);
+  var cost = cavern.leastCostToExit();
   print(cost);
 
   cavern = BigDangerousCavern.parse(input);
-  path = cavern.shortestPathToExit();
-  cost = cavern.costOfPath(path);
+  cost = cavern.leastCostToExit();
   print(cost);
 }

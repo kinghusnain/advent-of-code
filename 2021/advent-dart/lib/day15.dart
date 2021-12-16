@@ -1,5 +1,5 @@
-import 'dart:io';
 import 'dart:math';
+
 import 'package:collection/collection.dart';
 
 typedef Pt = Point<int>;
@@ -34,28 +34,25 @@ class DangerousCavern {
     if (pt.x < _xSize - 1) yield Pt(pt.x + 1, pt.y); // Right
   }
 
-  List<Pt> shortestPathToExit() => dijkstra(Pt(0, 0), _exit);
+  int leastCostToExit() => dijkstra(Pt(0, 0), _exit);
 
-  List<Pt> dijkstra(Pt start, Pt goal) {
-    final openSet = {start};
-    final Map<Pt, Pt> cameFrom = {};
-
+  int dijkstra(Pt start, Pt goal) {
     final distancesTo = Map.fromIterables(
         _dangerMap.keys, List.filled(_dangerMap.length, _xSize * _ySize * 9));
     distancesTo[start] = 0;
 
-    while (openSet.isNotEmpty) {
-      final u = openSet.reduce((value, element) =>
-          distancesTo[value]! < distancesTo[element]! ? value : element);
-      openSet.removeWhere((pt) => pt == u);
+    final openSet =
+        HeapPriorityQueue<Pt>((a, b) => distancesTo[a]! - distancesTo[b]!);
+    openSet.add(start);
 
-      if (u == goal) return reconstructPath(cameFrom, u);
+    while (openSet.isNotEmpty) {
+      final u = openSet.removeFirst();
+      if (u == goal) return distancesTo[u]!;
 
       for (var v in pointsAdjacentTo(u)) {
         final alt = distancesTo[u]! + _dangerMap[v]!;
         if (alt < distancesTo[v]!) {
           distancesTo[v] = alt;
-          cameFrom[v] = u;
           openSet.add(v);
         }
       }
@@ -63,20 +60,6 @@ class DangerousCavern {
 
     throw Exception();
   }
-
-  List<Pt> reconstructPath(Map<Pt, Pt> cameFrom, Pt current) {
-    final totalPath = [current];
-    while (cameFrom.containsKey(current)) {
-      current = cameFrom[current]!;
-      totalPath.insert(0, current);
-    }
-    return totalPath;
-  }
-
-  int costOfPath(List<Pt> path) => path
-      .sublist(1)
-      .map((pt) => _dangerMap[pt]!)
-      .fold(0, (value, element) => value + element);
 }
 
 class BigDangerousCavern extends DangerousCavern {

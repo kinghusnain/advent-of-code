@@ -15,15 +15,13 @@ void main() {
 
   test('Part 1 example', () {
     final cavern = DangerousCavern.parse(input);
-    final path = cavern.shortestPathToExit();
-    final cost = cavern.costOfPath(path);
+    final cost = cavern.leastCostToExit();
     expect(cost, 40);
   });
 
   test('Part 2 example', () {
     final cavern = BigDangerousCavern.parse(input);
-    final path = cavern.shortestPathToExit();
-    final cost = cavern.costOfPath(path);
+    final cost = cavern.leastCostToExit();
     expect(cost, 315);
   });
 }
