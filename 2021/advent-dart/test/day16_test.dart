@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:advent_dart/day16.dart';
 import 'package:test/test.dart';
 
@@ -15,14 +17,20 @@ void main() {
   });
 
   test('Operator packets', () {
-    var packet = OperatorPacket.parse('38006F45291200'.hexToBin());
+    var packet = OperatorPacket.parse(
+      '38006F45291200'.hexToBin(),
+      operatorFunction: (_) => throw UnimplementedError(),
+    );
     expect(packet.subPackets.length, 2);
     expect(packet.subPackets[0], isA<LiteralPacket>());
     expect((packet.subPackets[0] as LiteralPacket).value, 10);
     expect(packet.subPackets[1], isA<LiteralPacket>());
     expect((packet.subPackets[1] as LiteralPacket).value, 20);
 
-    packet = OperatorPacket.parse('EE00D40C823060'.hexToBin());
+    packet = OperatorPacket.parse(
+      'EE00D40C823060'.hexToBin(),
+      operatorFunction: (_) => throw UnimplementedError(),
+    );
     expect(packet.subPackets.length, 3);
     expect(packet.subPackets[0], isA<LiteralPacket>());
     expect((packet.subPackets[0] as LiteralPacket).value, 1);
@@ -63,13 +71,24 @@ void main() {
   });
 
   test('Part 2 examples', () {
-    expect(Packet.parse('C200B40A82'.hexToBin()).eval(), 3);
-    expect(Packet.parse('04005AC33890'.hexToBin()).eval(), 54);
-    expect(Packet.parse('880086C3E88112'.hexToBin()).eval(), 7);
-    expect(Packet.parse('CE00C43D881120'.hexToBin()).eval(), 9);
-    expect(Packet.parse('D8005AC2A8F0'.hexToBin()).eval(), 1);
-    expect(Packet.parse('F600BC2D8F'.hexToBin()).eval(), 0);
-    expect(Packet.parse('9C005AC2F8F0'.hexToBin()).eval(), 0);
-    expect(Packet.parse('9C0141080250320F1802104A08'.hexToBin()).eval(), 1);
+    expect(Packet.parse('C200B40A82'.hexToBin()).value, 3);
+    expect(Packet.parse('04005AC33890'.hexToBin()).value, 54);
+    expect(Packet.parse('880086C3E88112'.hexToBin()).value, 7);
+    expect(Packet.parse('CE00C43D881120'.hexToBin()).value, 9);
+    expect(Packet.parse('D8005AC2A8F0'.hexToBin()).value, 1);
+    expect(Packet.parse('F600BC2D8F'.hexToBin()).value, 0);
+    expect(Packet.parse('9C005AC2F8F0'.hexToBin()).value, 0);
+    expect(Packet.parse('9C0141080250320F1802104A08'.hexToBin()).value, 1);
+  });
+
+  test('Puzzle solutions', () {
+    final input = File('puzzle_input/day16.txt').readAsStringSync().trim();
+    final packet = Packet.parse(input.hexToBin());
+    final versionSum = packet
+        .decendPacketTree()
+        .map((p) => p.version)
+        .reduce((value, element) => value + element);
+    expect(versionSum, 929);
+    expect(packet.value, 911945136934);
   });
 }
