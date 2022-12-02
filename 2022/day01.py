@@ -1,10 +1,10 @@
 """Advent of Code 2022, Day 1."""
 
 import doctest
-from typing import Callable, Iterable
+from collections.abc import Callable, Generator, Iterable
 
 
-def part1(problem_input: str) -> int:
+def part1(problem_input: Iterable[str]) -> int:
     """Solution to part 1.
 
     >>> part1(sample_input)
@@ -14,7 +14,7 @@ def part1(problem_input: str) -> int:
     return max(caloric_inventory)
 
 
-def part2(problem_input: str) -> int:
+def part2(problem_input: Iterable[str]) -> int:
     """Solution to part 2.
 
     >>> part2(sample_input)
@@ -25,10 +25,10 @@ def part2(problem_input: str) -> int:
     return sum(caloric_inventory[-3:])
 
 
-def chunked(input: str) -> Iterable[list[int]]:
+def chunked(input: Iterable[str]) -> Generator[list[int], None, None]:
     chunk = []
-    for s in input.splitlines():
-        if s == "":
+    for s in input:
+        if s.strip() == "":
             yield chunk
             chunk = []
         else:
@@ -37,14 +37,14 @@ def chunked(input: str) -> Iterable[list[int]]:
         yield chunk
 
 
-def solve(func: Callable[[str], None]) -> None:
+def solve(func: Callable[[Iterable[str]], int]) -> None:
     with open("problem_input/day01.txt") as f:
-        problem_input = f.read()
-    print(func(problem_input))
+        print(func(f))
 
 
 if __name__ == "__main__":
-    sample_input = """1000
+    sample_input = """
+1000
 2000
 3000
 
@@ -57,7 +57,8 @@ if __name__ == "__main__":
 8000
 9000
 
-10000"""
+10000
+""".splitlines()
 
     doctest.testmod(verbose=True)
     solve(part1)
