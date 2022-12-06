@@ -1,9 +1,10 @@
 """Advent of Code 2022, Day 00."""
 
 import doctest
+from collections.abc import Callable, Iterable
 
 
-def part1(problem_input: list[int]) -> int:
+def part1(problem_input: Iterable[str]) -> int:
     """Solution to part 1.
 
     >>> part1(sample_input)
@@ -12,7 +13,7 @@ def part1(problem_input: list[int]) -> int:
     return 0
 
 
-def part2(problem_input: list[int]) -> int:
+def part2(problem_input: Iterable[str]) -> int:
     """Solution to part 2.
 
     >>> part2(sample_input)
@@ -21,22 +22,18 @@ def part2(problem_input: list[int]) -> int:
     return 0
 
 
-def solve():
+def solve(func: Callable[[Iterable[str]], int]) -> None:
     with open("problem_input/day00.txt") as f:
-        problem_input = [int(n) for n in f.readlines()]
-    print(part1(problem_input))
-    print(part2(problem_input))
+        print(func(f))
 
 
 if __name__ == "__main__":
-    sample_input = [
-        int(n)
-        for n in """
+    sample_input = """
 1
 2
 3
-    """.strip().split()
-    ]
+""".strip().splitlines()
 
     doctest.testmod(verbose=True)
-    solve()
+    # solve(part1)
+    # solve(part2)
