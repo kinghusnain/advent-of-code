@@ -16,13 +16,16 @@ def part1(problem_input: str) -> int:
     raise ValueError
 
 
-def part2(problem_input: Iterable[str]) -> int:
+def part2(problem_input: str) -> int:
     """Solution to part 2.
 
     >>> part2("mjqjpqmgbljsphdztnvjfqwrcgsmlb")
-    0
+    19
     """
-    return 0
+    for i in range(len(problem_input) - 14):
+        if len(set(problem_input[i : i + 14])) == 14:
+            return i + 14
+    raise ValueError
 
 
 def solve(func: Callable[[str], int]) -> None:
@@ -33,4 +36,4 @@ def solve(func: Callable[[str], int]) -> None:
 if __name__ == "__main__":
     doctest.testmod(verbose=True)
     solve(part1)
-    # solve(part2)
+    solve(part2)
