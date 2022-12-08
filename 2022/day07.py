@@ -1,9 +1,9 @@
 """Advent of Code 2022, Day 7."""
 
-from dataclasses import dataclass
 import doctest
 from collections.abc import Callable, Generator, Iterable
-from typing import Optional, Union
+from dataclasses import dataclass
+from typing import Optional
 
 
 def part1(problem_input: Iterable[str]) -> int:
@@ -32,7 +32,7 @@ def part2(problem_input: Iterable[str]) -> int:
 @dataclass
 class FileLike:
     name: str
-    parent: Union["Directory", None]
+    parent: Optional["Directory"]
 
 
 @dataclass
@@ -41,7 +41,7 @@ class File(FileLike):
 
 
 class Directory(FileLike):
-    def __init__(self, name: str, parent: "Directory"):
+    def __init__(self, name: str, parent: Optional["Directory"]):
         self.name = name
         self.parent = parent
         self.contents: list[FileLike] = []
@@ -65,11 +65,11 @@ class Directory(FileLike):
 
 def tree_from_log(log: Iterable[str]) -> Directory:
     root = Directory(name="/", parent=None)
-    pwd = root
+    pwd: Directory = root
     for line in log:
         line = line.strip()
         if line == "$ cd ..":
-            pwd = pwd.parent
+            pwd = pwd.parent if pwd.parent else root
         elif line == "$ cd /":
             pwd = root
         elif line.startswith("$ cd "):
@@ -80,8 +80,9 @@ def tree_from_log(log: Iterable[str]) -> Directory:
                 if isinstance(x, Directory) and x.name == dirname
             ]
             if len(matches) == 0:
-                pwd.contents.append(Directory(name=dirname, parent=pwd))
-                pwd = pwd.contents[-1]
+                newdir = Directory(name=dirname, parent=pwd)
+                pwd.contents.append(newdir)
+                pwd = newdir
             else:
                 pwd = matches[0]
         elif line[0].isdigit():
