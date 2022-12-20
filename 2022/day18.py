@@ -38,7 +38,74 @@ def part2(problem_input: Iterable[str]) -> int:
     >>> part2(sample_input)
     58
     """
-    return 58
+    droplet = [
+        Point(int(x), int(y), int(z))
+        for x, y, z in (l.split(",") for l in problem_input)
+    ]
+    total_surface: frozenset[tuple[Point, tuple]] = frozenset()
+    for p in droplet:
+        p_surfaces = frozenset(
+            [
+                (Point(p.x - 1, p.y, p.z), (1, 0, 0)),
+                (Point(p.x, p.y, p.z), (1, 0, 0)),
+                (Point(p.x, p.y - 1, p.z), (0, 1, 0)),
+                (Point(p.x, p.y, p.z), (0, 1, 0)),
+                (Point(p.x, p.y, p.z - 1), (0, 0, 1)),
+                (Point(p.x, p.y, p.z), (0, 0, 1)),
+            ]
+        )
+        total_surface = total_surface ^ p_surfaces
+
+    bubbles: set[Point] = set()
+    for z in range(20):
+        for y in range(20):
+            min_x = min((p.x for p in droplet if p.y == y and p.z == z), default=999)
+            max_x = max((p.x for p in droplet if p.y == y and p.z == z), default=-999)
+            for x in range(min_x, max_x):
+                if Point(x, y, z) not in droplet:
+                    bubbles.add(Point(x, y, z))
+
+    # Remove non-bubbles
+    checked: set[Point] = set()
+    to_check: set[Point] = set([Point(-1, 0, 0)])
+    while len(to_check) > 0:
+        p = to_check.pop()
+        if p in bubbles:
+            bubbles.remove(p)
+        checked.add(p)
+        adjacent = [
+            Point(p.x - 1, p.y, p.z),
+            Point(p.x + 1, p.y, p.z),
+            Point(p.x, p.y - 1, p.z),
+            Point(p.x, p.y + 1, p.z),
+            Point(p.x, p.y, p.z - 1),
+            Point(p.x, p.y, p.z + 1),
+        ]
+        to_check |= set(
+            p
+            for p in adjacent
+            if p.x in range(0, 20)
+            and p.y in range(0, 20)
+            and p.z in range(0, 20)
+            and p not in checked
+            and p not in droplet
+        )
+
+    bubbles_surface: frozenset[tuple[Point, tuple]] = frozenset()
+    for p in bubbles:
+        p_surfaces = frozenset(
+            [
+                (Point(p.x - 1, p.y, p.z), (1, 0, 0)),
+                (Point(p.x, p.y, p.z), (1, 0, 0)),
+                (Point(p.x, p.y - 1, p.z), (0, 1, 0)),
+                (Point(p.x, p.y, p.z), (0, 1, 0)),
+                (Point(p.x, p.y, p.z - 1), (0, 0, 1)),
+                (Point(p.x, p.y, p.z), (0, 0, 1)),
+            ]
+        )
+        bubbles_surface = bubbles_surface ^ p_surfaces
+
+    return len(total_surface - bubbles_surface)
 
 
 def solve(func: Callable[[Iterable[str]], int]) -> None:
@@ -65,4 +132,4 @@ if __name__ == "__main__":
 
     doctest.testmod(verbose=True)
     solve(part1)
-    # solve(part2)
+    solve(part2)
