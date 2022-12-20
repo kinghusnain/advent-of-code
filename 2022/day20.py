@@ -38,6 +38,36 @@ def part1(problem_input: Iterable[str]) -> int:
     )
 
 
+def part2(problem_input: Iterable[str]) -> int:
+    """Solution to part 2.
+
+    >>> part2(sample_input)
+    1623178306
+    """
+    original_numbers: list[int] = [int(n) * 811589153 for n in problem_input]
+    length = len(original_numbers)
+    mixed_order = [i for i in range(length)]
+
+    mixed = [original_numbers[i] for i in mixed_order]
+    for _ in range(10):
+        for orig_i in range(length):
+            n = original_numbers[orig_i]
+            i = mixed_order.index(orig_i)
+            
+            j = mixed_order[i]
+            del mixed_order[i]
+            mixed_order.insert((i + n) % (length - 1), j)
+
+            mixed = [original_numbers[i] for i in mixed_order]
+
+    zi = mixed.index(0)
+    return (
+        mixed[(zi + 1000) % length]
+        + mixed[(zi + 2000) % length]
+        + mixed[(zi + 3000) % length]
+    )
+
+
 def solve(func: Callable[[Iterable[str]], int]) -> None:
     with open("problem_input/day20.txt") as f:
         print(func(f.read().strip().splitlines()))
@@ -56,4 +86,4 @@ if __name__ == "__main__":
 
     doctest.testmod(verbose=True)
     solve(part1)
-    # solve(part2)
+    solve(part2)
