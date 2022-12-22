@@ -44,11 +44,28 @@ def part1(problem_input: Iterable[str]) -> int:
 
 
 def part2(problem_input: Iterable[str]) -> int:
-    """Solution to part 2.
+    """Solution to part 2."""
 
-    >>> part2(sample_input)
-    0
-    """
+    Monkey.directory = {}
+    defs = {k: v for k, v in [s.split(": ") for s in problem_input]}
+    root = Monkey("root", defs["root"], None)
+    unloaded_dependencies = [root]
+    solved: list[Monkey] = []
+    while len(unloaded_dependencies) > 0:
+        node = unloaded_dependencies.pop()
+        for id in [node.left_dependency, node.right_dependency]:
+            if id is None:
+                continue
+            assert id not in Monkey.directory
+            dep = Monkey(id, defs[id], node)
+            if Monkey.directory[id].value is None:
+                unloaded_dependencies.append(dep)
+            else:
+                solved.append(dep)
+
+    print("Plug this into an algebra solver. :)")
+    print(f"{Monkey.directory[root.left_dependency].humn_repr()} = {Monkey.directory[root.right_dependency].humn_repr()}") # type: ignore
+
     return 0
 
 
@@ -67,18 +84,21 @@ class Monkey:
         Monkey.directory[id] = self
         self.id = id
         self.value: Optional[int]
+        self.op_repr: str
         self.operation: Optional[Callable]
         self.left_dependency: Optional[str]
         self.right_dependency: Optional[str]
         self.dependency_of: Optional[Monkey] = dependency_of
         try:
             self.value = int(def_str)
+            self.op_repr = ''
             self.operation = None
             self.left_dependency = None
             self.right_dependency = None
         except ValueError:
             left, op, right = def_str.split()
             self.value = None
+            self.op_repr = op.strip()
             self.operation = Monkey.op_fn[op.strip()]
             self.left_dependency = left.strip()
             self.right_dependency = right.strip()
@@ -104,6 +124,18 @@ class Monkey:
                 Monkey.directory[self.left_dependency].value,
                 Monkey.directory[self.right_dependency].value,
             )
+    
+    def humn_repr(self) -> str:
+        if self.id == 'humn':
+            return 'x'
+        elif self.value is not None:
+            return str(self.value)
+        else:
+            repr = f"({Monkey.directory[self.left_dependency].humn_repr()} {self.op_repr} {Monkey.directory[self.right_dependency].humn_repr()})" # type: ignore
+            try:
+                return str(int(eval(repr)))
+            except:
+                return repr
 
 
 def solve(func: Callable[[Iterable[str]], int]) -> None:
@@ -132,4 +164,4 @@ hmdt: 32
 
     doctest.testmod(verbose=True)
     solve(part1)
-    # solve(part2)
+    solve(part2)
