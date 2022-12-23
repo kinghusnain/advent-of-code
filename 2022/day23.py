@@ -111,9 +111,74 @@ def part2(problem_input: Iterable[str]) -> int:
     """Solution to part 2.
 
     >>> part2(sample_input)
-    0
+    20
     """
-    return 0
+    elf_positions: set[Point] = set()
+    y = 0
+    for row in problem_input:
+        for x in range(len(row)):
+            if row[x] == "#":
+                elf_positions.add(Point(x, y))
+        y -= 1
+
+    directions = [Point(0, 1), Point(0, -1), Point(-1, 0), Point(1, 0)]
+    round = 0
+    while True:
+        round += 1
+
+        proposed_moves: dict[Point, Point] = {}
+        for e in elf_positions:
+            if (
+                set(
+                    [
+                        Point(e.x - 1, e.y + 1),
+                        Point(e.x, e.y + 1),
+                        Point(e.x + 1, e.y + 1),
+                        Point(e.x - 1, e.y),
+                        Point(e.x + 1, e.y),
+                        Point(e.x - 1, e.y - 1),
+                        Point(e.x, e.y - 1),
+                        Point(e.x + 1, e.y - 1),
+                    ]
+                )
+                & elf_positions
+                == set()
+            ):
+                continue
+            for d in directions:
+                if d.x == 0:
+                    to_examine = set(Point(e.x + dx, e.y + d.y) for dx in [-1, 0, 1])
+                    if elf_positions & to_examine == set():
+                        proposed_moves[e] = Point(e.x + d.x, e.y + d.y)
+                        break
+                else:
+                    to_examine = set(Point(e.x + d.x, e.y + dy) for dy in [-1, 0, 1])
+                    if elf_positions & to_examine == set():
+                        proposed_moves[e] = Point(e.x + d.x, e.y + d.y)
+                        break
+        new_positions: set[Point] = set()
+        for e in elf_positions:
+            if (
+                e in proposed_moves
+                and len(
+                    [
+                        dest
+                        for dest in proposed_moves.values()
+                        if dest == proposed_moves[e]
+                    ]
+                )
+                == 1
+            ):
+                new_positions.add(proposed_moves[e])
+            else:
+                new_positions.add(e)
+        if elf_positions == new_positions:
+            break
+        else:
+            elf_positions = new_positions
+            directions = directions[1:] + [directions[0]]
+
+    return round
 
 
 def solve(func: Callable[[Iterable[str]], int]) -> None:
@@ -134,4 +199,4 @@ if __name__ == "__main__":
 
     doctest.testmod(verbose=True)
     solve(part1)
-    # solve(part2)
+    solve(part2)
